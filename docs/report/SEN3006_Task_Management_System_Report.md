@@ -347,7 +347,7 @@ sequenceDiagram
         deactivate Registry
         TM->>BTF: createTask("Fix login", "Login fails", 1)
         activate BTF
-        BTF->>BT: new BugTask("Fix login", "Login fails", 1)
+        BTF->>BT: new BugTask("Fix login", "Login fails", 1, "MEDIUM", "")
         activate BT
         BT-->>BTF: bugTask
         deactivate BT

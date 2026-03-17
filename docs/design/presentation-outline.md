@@ -119,7 +119,7 @@
 - Run command: `javac *.java && java Main` (from src/main/java directory)
 
 ### Speaker Notes
-Walk through each of the 5 test sections in the console output:
+Walk through each of the 6 test sections in the console output:
 
 - **Test 1 -- Factory Method Pattern Demo:**
   - "Here we create three factories and use each one to create a task. Notice the output shows three different task types -- BUG, FEATURE, DOCUMENTATION -- all created through the same `TaskFactory` reference."
@@ -148,6 +148,11 @@ Walk through each of the 5 test sections in the console output:
   - "OCP: we create an anonymous `PriorityStrategy` inline (lowest-first for backlog grooming) and plug it in with zero changes to existing code."
   - "LSP: all three factories are used through a `TaskFactory[]` array -- fully interchangeable."
   - "DIP: TaskManager fields are all abstractions: `List<Task>`, `PriorityStrategy`, `TaskFactory`."
+
+- **Test 6 -- Edge Cases and Error Handling:**
+  - "We test 6 edge cases: invalid priority, null title, unknown task type, non-existent task ID, null strategy, and case-insensitive type lookup."
+  - "Every invalid input is caught with a clear error message -- no crashes, no silent failures."
+  - "All 6/6 edge cases pass."
 
 - Transition: "Let me now zoom into the code for the three most important classes."
 

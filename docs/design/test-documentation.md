@@ -28,7 +28,7 @@ If you see `ALL TESTS PASSED` at the end, the system is working correctly.
 
 ## Test Sections Explained
 
-The `Main.java` file contains 5 test sections that demonstrate the system works correctly. Each test prints `[PASS]` when successful.
+The `Main.java` file contains 6 test sections that demonstrate the system works correctly. Each test prints `[PASS]` when successful.
 
 ### Test 1: Factory Method Pattern Demo
 **What it tests:** That each factory creates the correct task type without the caller knowing which concrete class is used.
@@ -86,6 +86,19 @@ The `Main.java` file contains 5 test sections that demonstrate the system works 
 
 **Why this matters:** Proves the code follows software engineering best practices required by the project.
 
+### Test 6: Edge Cases and Error Handling
+**What it tests:** That the system gracefully handles invalid inputs and boundary conditions.
+
+**What you should see:**
+- **Invalid priority (0):** `IllegalArgumentException` with message "Priority must be between 1 and 5, got: 0"
+- **Null title:** `IllegalArgumentException` with message "Title must not be null or blank."
+- **Unknown task type ("UNKNOWN_TYPE"):** `IllegalArgumentException` listing available types
+- **Non-existent task ID (99999):** `IllegalArgumentException` with message "No task found with ID: 99999"
+- **Null strategy:** `IllegalArgumentException` with message "Strategy must not be null."
+- **Case-insensitive type ("bug" lowercase):** Successfully creates a BugTask, proving case-insensitive lookup works
+
+**Why this matters:** Proves the system is robust and doesn't crash on bad input — every error is caught and reported clearly.
+
 ---
 
 ## Edge Cases Handled
@@ -124,11 +137,12 @@ If any test fails, the specific `[PASS]` marker will be missing and an error mes
 
 After running the program, verify:
 
-- [ ] All 5 test sections show `[PASS]`
+- [ ] All 6 test sections show `[PASS]`
 - [ ] Test 1 creates 3 different task types correctly
 - [ ] Test 2 shows 3 different orderings of the same 5 tasks
 - [ ] Test 3 catches 2 expected exceptions (invalid transition + terminal state)
 - [ ] Test 4 shows filtered views and task removal
 - [ ] Test 5 demonstrates all 5 SOLID principles
+- [ ] Test 6 catches all 6 edge cases (6/6 passed)
 - [ ] Final summary shows "ALL TESTS PASSED"
 - [ ] No compilation warnings or errors

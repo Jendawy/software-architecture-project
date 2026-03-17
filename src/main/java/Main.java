@@ -12,13 +12,14 @@ import java.util.List;
  *       can be shown during the in-person project presentation to the professor.</li>
  * </ol>
  *
- * <p>The test cases are organized into 5 sections:</p>
+ * <p>The test cases are organized into 6 sections:</p>
  * <ul>
  *   <li>Test 1: Factory Method Pattern Demo</li>
  *   <li>Test 2: Strategy Pattern Demo</li>
  *   <li>Test 3: Task Lifecycle (State Transitions) Demo</li>
  *   <li>Test 4: TaskManager Integration Demo</li>
  *   <li>Test 5: SOLID Principles Demo</li>
+ *   <li>Test 6: Edge Cases and Error Handling</li>
  * </ul>
  */
 public class Main {
