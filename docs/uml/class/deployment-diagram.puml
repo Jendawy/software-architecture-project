@@ -1,0 +1,48 @@
+@startuml deployment-diagram
+!theme plain
+skinparam shadowing false
+skinparam defaultFontSize 11
+skinparam nodeBackgroundColor #FEFECE
+
+title Task Management System - Deployment Diagram\nLayered Architecture
+
+node "JVM Runtime Environment" as JVM {
+
+    node "Console UI Layer" as UILayer {
+        artifact "Main.java" as Main
+        note right of Main
+            Entry point for
+            user interaction
+        end note
+    }
+
+    node "Business Logic Layer" as BizLayer {
+        artifact "TaskManager" as TM
+        artifact "UrgentFirstStrategy" as UFS
+        artifact "DeadlineFirstStrategy" as DFS
+        artifact "SeverityFirstStrategy" as SFS
+    }
+
+    node "Domain Model Layer" as DomainLayer {
+        artifact "Task / AbstractTask" as Tasks
+        artifact "BugTask" as BT
+        artifact "FeatureTask" as FT
+        artifact "DocumentationTask" as DT
+        artifact "TaskFactory hierarchy" as Factories
+        artifact "TaskStatus" as TS
+    }
+}
+
+' Layer dependencies
+Main --> TM : invokes
+TM --> UFS : delegates
+TM --> DFS : delegates
+TM --> SFS : delegates
+TM --> Tasks : manages
+TM --> Factories : creates via
+Factories --> BT : produces
+Factories --> FT : produces
+Factories --> DT : produces
+Tasks --> TS : uses
+
+@enduml

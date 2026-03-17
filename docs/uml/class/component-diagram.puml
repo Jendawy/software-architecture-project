@@ -1,0 +1,62 @@
+@startuml component-diagram
+!theme plain
+skinparam shadowing false
+skinparam defaultFontSize 11
+skinparam componentStyle uml2
+skinparam packageStyle rectangle
+
+title Task Management System - Component Diagram
+
+package "UI Module" {
+    component [Main] as UI
+}
+
+package "Manager Module" {
+    component [TaskManager] as MGR
+}
+
+package "Factory Module" {
+    component [TaskFactory] as TF
+    component [BugTaskFactory] as BTF
+    component [FeatureTaskFactory] as FTF
+    component [DocumentationTaskFactory] as DTF
+
+    BTF -up-|> TF
+    FTF -up-|> TF
+    DTF -up-|> TF
+}
+
+package "Strategy Module" {
+    component [PriorityStrategy] as PS
+    component [UrgentFirstStrategy] as UFS
+    component [DeadlineFirstStrategy] as DFS
+    component [SeverityFirstStrategy] as SFS
+
+    UFS -up-|> PS
+    DFS -up-|> PS
+    SFS -up-|> PS
+}
+
+package "Domain Model" {
+    component [Task] as T
+    component [AbstractTask] as AT
+    component [BugTask] as BT
+    component [FeatureTask] as FT
+    component [DocumentationTask] as DT
+    component [TaskStatus] as TS
+
+    AT -up-|> T
+    BT -up-|> AT
+    FT -up-|> AT
+    DT -up-|> AT
+    AT --> TS
+}
+
+' Dependencies
+UI --> MGR : uses
+MGR --> TF : creates tasks via
+MGR --> PS : delegates sorting to
+MGR --> T : manages
+TF --> T : produces
+
+@enduml

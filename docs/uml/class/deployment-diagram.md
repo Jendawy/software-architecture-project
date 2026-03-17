@@ -1,0 +1,39 @@
+# Deployment Diagram
+
+This diagram shows the **layered architecture** of the Task Management System running within a JVM environment. The Console UI Layer handles user interaction, the Business Logic Layer contains the TaskManager and prioritization strategies, and the Domain Model Layer holds the task entities, factories, and status enum.
+
+```mermaid
+flowchart TB
+    subgraph JVM["JVM Runtime Environment"]
+        subgraph UILayer["Console UI Layer"]
+            Main["Main.java"]
+        end
+
+        subgraph BizLayer["Business Logic Layer"]
+            TM["TaskManager"]
+            UFS["UrgentFirstStrategy"]
+            DFS["DeadlineFirstStrategy"]
+            SFS["SeverityFirstStrategy"]
+        end
+
+        subgraph DomainLayer["Domain Model Layer"]
+            Tasks["Task / AbstractTask"]
+            BT["BugTask"]
+            FT["FeatureTask"]
+            DT["DocumentationTask"]
+            Factories["TaskFactory hierarchy"]
+            TS["TaskStatus"]
+        end
+    end
+
+    Main -->|invokes| TM
+    TM -->|delegates| UFS
+    TM -->|delegates| DFS
+    TM -->|delegates| SFS
+    TM -->|manages| Tasks
+    TM -->|creates via| Factories
+    Factories -->|produces| BT
+    Factories -->|produces| FT
+    Factories -->|produces| DT
+    Tasks --> TS
+```

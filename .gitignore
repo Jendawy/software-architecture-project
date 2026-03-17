@@ -1,0 +1,39 @@
+# Compiled class files
+*.class
+bin/
+out/
+build/
+
+# Package files
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+
+# IDE
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# PlantUML exports
+docs/uml/exports/
+
+# Environment
+.env
+.env.local
+
+# AI / Claude Code (not for submission)
+CLAUDE.md
+.claude/
+.mcp.json
+docs/design/project-options.md
