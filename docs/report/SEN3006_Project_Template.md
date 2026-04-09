@@ -53,8 +53,8 @@ The original contribution of this project is the demonstration of **double exten
 - Three prioritization strategies: Urgent-First, Deadline-First, Severity-First.
 - A validated task lifecycle state machine (OPEN, IN_PROGRESS, REVIEW, DONE, BLOCKED).
 - A `TaskManager` that coordinates creation, prioritization, filtering, and reporting.
-- Seven UML diagrams and a complete test suite in `Main.java`.
-- An interactive console application for live demonstration.
+- Seven UML diagrams and a complete test suite in `Main.java` (six sections).
+- A separate interactive console application (`TaskManagementApp.java`) for live demonstration.
 - Zero external dependencies — only `java.util` and `java.time`.
 
 **Scope — Excluded:** persistent storage, multi-user concurrency, GUI, authentication, network services. These are acknowledged as future work.
@@ -83,9 +83,11 @@ The system follows a layered object-oriented architecture organized into five lo
 
 **1. Factory Method (Creational).** Defers instantiation to subclasses. `TaskFactory` declares the abstract `createTask(...)` method; `BugTaskFactory`, `FeatureTaskFactory`, and `DocumentationTaskFactory` each override it to produce their specific product with sensible defaults. `TaskFactory` additionally provides a `createTaskWithDeadline(...)` template method layered on top of the factory method.
 
-**2. Strategy (Behavioral).** Encapsulates a family of algorithms behind a common interface. `PriorityStrategy.sort(List<Task>)` is implemented by `UrgentFirstStrategy` (priority descending), `DeadlineFirstStrategy` (deadline ascending, nulls last), and `SeverityFirstStrategy` (two-tier sort: bugs first by severity, then non-bugs by priority). `TaskManager` holds a `PriorityStrategy` reference and delegates sorting to it; strategies are swappable at runtime via `setPriorityStrategy(...)`.
+**2. Strategy (Behavioral).** Encapsulates a family of algorithms behind a common interface. `PriorityStrategy.sort(List<Task>)` is implemented by `UrgentFirstStrategy` (priority descending), `DeadlineFirstStrategy` (deadline ascending, nulls last), and `SeverityFirstStrategy` (two-tier sort: bugs first by severity rank, then non-bugs by priority). `TaskManager` holds a `PriorityStrategy` reference (`currentStrategy`) and delegates sorting to it; strategies are swappable at runtime via `setPriorityStrategy(...)`.
 
 These two patterns were chosen because they address orthogonal concerns — *object creation* and *algorithmic behavior* — and their composition inside `TaskManager` illustrates how patterns can coexist naturally in a single design.
+
+**Additional creative twist — Simplified Service Locator.** `TaskManager` keeps an internal `Map<String, TaskFactory>` registry that maps type strings (`"BUG"`, `"FEATURE"`, `"DOCUMENTATION"`) to factory instances. This layers a simplified Service Locator on top of the Factory Method hierarchy, so clients can request task creation by name without knowing which factory to use.
 
 ### UML Diagrams (Class, Sequence, Use Case, and more)
 
@@ -104,7 +106,7 @@ Seven diagrams are produced as PlantUML sources in [docs/uml/](../uml/):
 ### Implementation Approach in Java
 
 - **Language level:** Java 8+ (developed and tested on JDK 21).
-- **Package structure:** single default package (16 source files in [src/main/java/](../../src/main/java/)).
+- **Package structure:** single default package (17 source files in [src/main/java/](../../src/main/java/)).
 - **Abstraction layering:** interfaces and abstract classes at the top of each hierarchy; concrete implementations at the bottom.
 - **Immutability:** strategies return *new* sorted lists without mutating the caller's list.
 - **State machine:** enforced by per-constant `allowedTransitions()` overrides in `TaskStatus`, with `AbstractTask.setStatus(...)` throwing `IllegalArgumentException` on invalid transitions.
@@ -116,7 +118,8 @@ Seven diagrams are produced as PlantUML sources in [docs/uml/](../uml/):
 - **Visual Studio Code** with Red Hat Java, Debugger for Java, and Test Runner for Java extensions.
 - **PlantUML** and **Mermaid** for UML diagram generation.
 - **Git / GitHub** for version control ([hoop-ai/software-architecture-project](https://github.com/hoop-ai/software-architecture-project)).
-- **Manual test harness** (`Main.java`) structured into six labeled sections that produce PASS/FAIL output for live classroom demonstration.
+- **Manual test harness** (`Main.java`) structured into six labeled sections that produce PASS/FAIL output.
+- **Interactive console** (`TaskManagementApp.java`) with a menu-driven CLI for live classroom demonstration (separate entry point).
 
 ---
 
@@ -128,7 +131,7 @@ Seven diagrams are produced as PlantUML sources in [docs/uml/](../uml/):
 |---|---|---|---|
 | **WP1** | Problem Definition | Problem statement, functional and non-functional requirements, scope document, pattern selection rationale | Complete |
 | **WP2** | Design & UML | Seven PlantUML diagrams, full design specification ([docs/design/design-spec.md](../design/design-spec.md)), class-hierarchy decisions | Complete |
-| **WP3** | Implementation | 16 Java source files implementing Factory Method, Strategy, the state machine, and the `TaskManager` coordinator | Complete |
+| **WP3** | Implementation | 17 Java source files implementing Factory Method, Strategy, the state machine, the `TaskManager` coordinator, and a separate interactive console application | Complete |
 | **WP4** | Testing | Six test sections in `Main.java` covering pattern behavior, state transitions, integration, and SOLID compliance; test documentation in [docs/design/test-documentation.md](../design/test-documentation.md) | Complete |
 | **WP5** | Reporting | Full project report ([docs/report/report.md](report.md)), this filled template, presentation outline, submission package | Complete |
 
@@ -151,17 +154,16 @@ Seven diagrams are produced as PlantUML sources in [docs/uml/](../uml/):
 
 ### Class Structure
 
-The system consists of **16 Java files** in [src/main/java/](../../src/main/java/):
+The system consists of **17 Java files** in [src/main/java/](../../src/main/java/):
 
 - **2 interfaces:** `Task`, `PriorityStrategy`
 - **1 enum:** `TaskStatus` (with per-constant state-machine overrides)
-- **1 abstract class:** `AbstractTask`
-- **1 abstract factory:** `TaskFactory`
+- **2 abstract classes:** `AbstractTask`, `TaskFactory`
 - **3 concrete tasks:** `BugTask`, `FeatureTask`, `DocumentationTask`
 - **3 concrete factories:** `BugTaskFactory`, `FeatureTaskFactory`, `DocumentationTaskFactory`
 - **3 concrete strategies:** `UrgentFirstStrategy`, `DeadlineFirstStrategy`, `SeverityFirstStrategy`
 - **1 coordinator:** `TaskManager`
-- **1 entry point:** `Main` (six test sections + interactive console)
+- **2 entry points:** `Main` (six automated test sections) and `TaskManagementApp` (interactive menu-driven console)
 
 ### Interfaces and Abstract Classes
 
