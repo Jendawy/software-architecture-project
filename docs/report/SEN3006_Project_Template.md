@@ -175,13 +175,15 @@ The system consists of **17 Java files** in [src/main/java/](../../src/main/java
 
 ### Pattern Implementation
 
-**Factory Method.** `TaskManager` maintains a `Map<String, TaskFactory>` registry pre-populated with the three concrete factories. `createTask(type, ...)` looks up the factory by type string and delegates. New task types are added via `registerFactory(...)` — no modification to existing classes required.
+**Factory Method (+ Simplified Service Locator).** `TaskManager` maintains a `Map<String, TaskFactory>` registry (`factoryRegistry`) pre-populated with the three concrete factories in its constructor. `createTask(type, ...)` looks up the factory by type string and delegates the actual instantiation. New task types are added via `registerFactory(...)` — no modification to existing classes required.
 
 ```java
 public Task createTask(String type, String title, String description, int priority) {
     TaskFactory factory = factoryRegistry.get(type.toUpperCase());
     if (factory == null) {
-        throw new IllegalArgumentException("No factory registered for type: " + type);
+        throw new IllegalArgumentException(
+                "No factory registered for task type: " + type
+                + ". Available types: " + factoryRegistry.keySet());
     }
     Task task = factory.createTask(title, description, priority);
     tasks.add(task);
@@ -189,15 +191,18 @@ public Task createTask(String type, String title, String description, int priori
 }
 ```Yeah, I designed it in a nice Word document. 
 
-**Strategy.** `TaskManager` holds a `PriorityStrategy` reference (default: `UrgentFirstStrategy`). `getPrioritizedTasks()` delegates to `strategy.sort(tasks)`. `setPriorityStrategy(...)` swaps the algorithm at runtime.
+**Strategy.** `TaskManager` holds a `PriorityStrategy` reference named `currentStrategy` (default: `UrgentFirstStrategy`, set in the constructor). `getPrioritizedTasks()` delegates to `currentStrategy.sort(tasks)`. `setPriorityStrategy(...)` swaps the algorithm at runtime and rejects `null`.
 
 ```java
 public List<Task> getPrioritizedTasks() {
-    return strategy.sort(tasks);
+    return currentStrategy.sort(tasks);
 }
 
 public void setPriorityStrategy(PriorityStrategy strategy) {
-    this.strategy = strategy;
+    if (strategy == null) {
+        throw new IllegalArgumentException("Strategy must not be null.");
+    }
+    this.currentStrategy = strategy;
 }
 ```
 
@@ -225,8 +230,10 @@ All tests are executed by running `Main.java`, which contains **six labeled sect
 | 2 | Strategy Demo | The same task list sorted three different ways by swapping strategies at runtime. |
 | 3 | Lifecycle / State Transitions | Valid path OPEN→IN_PROGRESS→REVIEW→DONE; blocked path; invalid-transition rejection; terminal-state enforcement. |
 | 4 | TaskManager Integration | Mixed task creation, status transitions, filtering by status, summary report, task removal. |
-| 5 | SOLID Principles Demo | OCP (custom anonymous strategy added at runtime), LSP (factories substitutable), DIP (only abstractions used), SRP, ISP. |
-| 6 | Interactive Console | Menu-driven CLI for hands-on demonstration. |
+| 5 | SOLID Principles Demo | OCP (custom anonymous "lowest-first" strategy added at runtime), LSP (factories substitutable via `TaskFactory` reference), DIP (only abstractions used), SRP, ISP. |
+| 6 | Edge Cases and Error Handling | Six edge cases: invalid priority (out of 1–5), null title, unknown task type, task not found by ID, null strategy, case-insensitive type lookup. |
+
+A separate interactive menu-driven console application (`TaskManagementApp.java`) is also provided for hands-on demonstration — it runs independently of the automated test suite.
 
 ### Sample Inputs / Outputs
 
@@ -258,14 +265,20 @@ All tests are executed by running `Main.java`, which contains **six labeled sect
 
 ### Main.java Execution Explanation
 
-Build and run the entire test suite with two commands:
+Build once, then run either entry point:
 
 ```bash
+# Compile all sources
 javac -d bin src/main/java/*.java
+
+# Run the automated six-section test suite
 java -cp bin Main
+
+# Run the interactive menu-driven console (separate application)
+java -cp bin TaskManagementApp
 ```
 
-Each section produces human-readable headers, tabular task output, and `[PASS]` markers, making the test run suitable for live classroom demonstration. After the six automated sections, the program enters an interactive menu-driven console that lets the user create tasks, switch strategies, and transition states by hand.
+Each test section in `Main` produces human-readable headers, tabular task output, and `[PASS]` markers, ending with a final summary banner. `TaskManagementApp` provides a menu that lets the user create tasks, switch strategies, transition task states, and view summaries by hand — ideal for live classroom demonstration.
 
 ---
 
