@@ -34,6 +34,22 @@ docs/uml/exports/
 
 # AI / Claude Code (not for submission)
 CLAUDE.md
+AGENTS.md
 .claude/
+.agents/
 .mcp.json
 docs/design/project-options.md
+
+# Dev workflow tooling (not for submission)
+changelog/
+knowledgebase/
+sessions/
+
+# Deck working artifacts (intermediate renders/captures, not deliverables)
+deck/__pycache__/
+deck/_cap/
+deck/_dia/
+deck/_render/
+
+# Scratch verification screenshots
+docs/report/_*.png
