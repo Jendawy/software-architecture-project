@@ -51,7 +51,7 @@ KW=C("8250DF"); TYP=C("0550AE"); STRc=C("0A7B33"); NUMc=C("0550AE"); COM=C("8C87
 SERIF_SB="Spectral SemiBold"; SERIF="Spectral"; SERIF_MD="Spectral Medium"
 SANS="Inter"; SANS_SB="Inter SemiBold"; SANS_MD="Inter Medium"; MONO="Consolas"
 
-SW, SH = 13.333, 7.5; M = 0.82; TOTAL = 30
+SW, SH = 13.333, 7.5; M = 0.82; TOTAL = 32
 
 prs = Presentation(); prs.slide_width = Emu(int(SW*914400)); prs.slide_height = Emu(int(SH*914400))
 BLANK = prs.slide_layouts[6]
@@ -104,16 +104,18 @@ def chip(s, x, y, size, tint, name, key, frac=0.56):
 def eyebrow(s, label, accent=INDIGO):
     rrect(s, M, 0.64, 0.07, 0.24, accent, radius=0.5)
     text(s, M+0.22, 0.64, 9, 0.3, [{"t": label.upper(), "size": 11, "color": accent, "bold": True, "track": 2.0, "font": SANS_SB}])
+SECTION_HUE = {1: INDIGO, 2: VIOLET, 3: TEAL, 4: GREEN, 5: AMBER}
 def tracker(s, active, on_dark=False):
     n=5; segw=0.32; gap=0.10; y=0.70
     x0 = SW-M-(n*segw+(n-1)*gap)
+    hue = SECTION_HUE.get(active, INDIGO)
     for i in range(n):
         x = x0+i*(segw+gap)
-        if i == active-1: col = INDIGO_D if on_dark else INDIGO
+        if i == active-1: col = hue
         else:             col = RULE_DK if on_dark else RULE
         rrect(s, x, y, segw, 0.07, col, radius=0.5)
     text(s, x0, y+0.13, n*segw+(n-1)*gap, 0.2,
-         [{"t": f"SECTION {active} / 5", "size": 7.5, "color": GRAYW if on_dark else FAINT, "track": 1.4, "font": SANS_SB}],
+         [{"t": f"SECTION {active} / 5", "size": 7.5, "color": hue, "track": 1.4, "font": SANS_SB}],
          align=PP_ALIGN.RIGHT)
 def title(s, t, y=1.42, color=INK, size=29, w=None):
     text(s, M, y, w or (SW-2*M), 1.0, [{"t": t, "size": size, "color": color, "font": SERIF_SB, "line": 1.04}])
@@ -274,7 +276,7 @@ s = slide(PAPER); eyebrow(s, "Contents"); tracker(s, 1)
 title(s, "What this presentation covers.")
 toc = [("01","Introduction and problem definition","target-04","indigo",INDIGO,INDIGO_T,"~3 min"),
        ("02","The design patterns: Factory Method, Strategy, State","puzzle-piece-01","violet",VIOLET,VIOLET_T,"~5 min"),
-       ("03","Architecture and implementation","grid-01","teal",TEAL,TEAL_T,"~3 min"),
+       ("03","Architecture and implementation","grid-01","teal",TEAL,TEAL_T,"~4 min"),
        ("04","Live demonstration","terminal","green",GREEN,GREEN_T,"~3 min"),
        ("05","Results, evaluation and conclusion","trophy-01","amber",AMBER,AMBER_T,"~2 min")]
 y0 = 2.62
@@ -445,7 +447,7 @@ card(s, M+colw+gap, 4.62, colw, 1.78, CLAY_T, "layers-three-01", "indigo", "A te
 footer(s, 11)
 notes(s, NAME1 + ".\n"
     "Here is the implementation. The manager holds a Map from a string key to a factory. The caller writes createTask with the string BUG, and the manager looks up the right factory and calls it. The caller never imports BugTask. When we added Documentation late in the project, we registered it once and the console menu offered it automatically, because the menu just walks the registry.\n"
-    "Two decisions we expect questions on. Left: we used an abstract class, not an interface, so each subclass can own its defaults. Right: createTaskWithDeadline lives on the base and wraps the abstract createTask, which is Template Method sitting on top of Factory Method, so the deadline logic is written once, not three times. Over to " + NAME2 + " for Strategy.")
+    "Two decisions we expect questions on. Left: we used an abstract class, not an interface, so each subclass can own its defaults. Right: createTaskWithDeadline lives on the base and wraps the abstract createTask, which is Template Method sitting on top of Factory Method, so the deadline logic is written once, not three times. Now, Strategy.")
 
 # 12 STRATEGY · definition ----------------------------------------------------
 s = slide(PAPER); eyebrow(s, "Pattern 2  ·  Strategy", TEAL); tracker(s, 2)
@@ -459,7 +461,7 @@ for i,(icon,key,tint,h,b) in enumerate(st):
     c,r=i%2,i//2; x=M+c*(colw+gap); y=2.55+r*(rh+0.26)
     card(s, x, y, colw, rh, tint, icon, key, h, b, tsize=14)
 footer(s, 12)
-notes(s, NAME2 + ".\n"
+notes(s, NAME1 + ".\n"
     "Strategy, same structure. The definition: define a family of interchangeable algorithms, put each behind a common interface, and choose between them at runtime. Our interface is PriorityStrategy with a single sort method, and we have three implementations.\n"
     "Why it fits: the same list needs different orderings in different moments, and the user changes that while the app runs. The advantage, again tied to our objective: a new ordering is a new class, and the manager that holds the list never changes. The everyday example is a maps app, where fastest, shortest, and avoid tolls are three strategies over one map. Next, the code.")
 
@@ -476,7 +478,7 @@ card(s, M, 4.5, colw, 1.9, TEAL_T, "switch-horizontal-01", "teal", "An interface
 card(s, M+colw+gap, 4.5, colw, 1.9, TEAL_T, "settings-01", "indigo", "A setter, not a constructor argument",
      "Users change the sort mid-session. A setter avoids rebuilding the manager and copying every task into a fresh instance.", tsize=13.5)
 footer(s, 13)
-notes(s, NAME2 + ".\n"
+notes(s, NAME1 + ".\n"
     "The implementation is small. The manager holds one PriorityStrategy field. Changing the order is one setter call, and the next listing comes back sorted differently, with no recompile.\n"
     "Two decisions. Left: we used a named interface rather than a raw Java Comparator, because the name PriorityStrategy advertises the role in the system, and because SeverityFirst lifts bugs to the top before sorting the rest, which is stateful work a pairwise Comparator does awkwardly. Right: we used a setter rather than constructor injection, because the user swaps sorts while the app runs. The next slide shows this happening for real in the GUI.")
 
@@ -487,7 +489,7 @@ gap=0.55; colw=(SW-2*M-gap)/2
 img_panel(s, "gui-strategy.png", M, 2.5, colw, 3.7, accent=TEAL, caption="Urgent First sort: priority 5 down to 1.")
 img_panel(s, "gui-severity.png", M+colw+gap, 2.5, colw, 3.7, accent=TEAL, caption="Severity First sort: both bugs rise to the top.")
 footer(s, 14)
-notes(s, NAME2 + ".\n"
+notes(s, NAME1 + ".\n"
     "These are two real screenshots of our running GUI, the same five tasks in both. On the left, sorted Urgent First, the rows run by priority, five down to one. On the right, after switching the Sort by dropdown to Severity First, the two bug rows jump to the top, and the status bar confirms the active strategy changed.\n"
     "Nothing was recompiled between these two pictures. The list of tasks is identical; only the strategy object changed, through one setter call wired to the dropdown. This is the clearest single piece of evidence that the pattern works. In the live demo we will do this switch in front of you.")
 
@@ -506,9 +508,9 @@ for i,(h,b) in enumerate(points):
     text(s, bx+0.44, y, SW-M-bx-0.44, 0.4, [{"t": h, "size": 13, "color": INK, "font": SANS_SB}])
     text(s, bx+0.44, y+0.30, SW-M-bx-0.44, 0.7, [{"t": b, "size": 11, "color": BODY, "line": 1.28}])
 footer(s, 15)
-notes(s, NAME2 + ".\n"
+notes(s, NAME1 + ".\n"
     "The bonus. The rubric only asks for one creational and one behavioural pattern, but the lifecycle is a natural state machine, so we encoded it cheaply. The normal path is OPEN, then IN_PROGRESS when a developer picks it up, then REVIEW, then DONE, which is terminal. A reviewer can reject back to IN_PROGRESS, any active task can be BLOCKED, and BLOCKED returns to OPEN.\n"
-    "The rules live on the enum itself through canTransitionTo, and setStatus throws if you try an illegal jump such as OPEN straight to DONE. So this is the State pattern in one enum, with no extra classes, and an illegal jump like OPEN to DONE is simply impossible to reach. Back to me for the architecture section.")
+    "The rules live on the enum itself through canTransitionTo, and setStatus throws if you try an illegal jump such as OPEN straight to DONE. So this is the State pattern in one enum, with no extra classes, and an illegal jump like OPEN to DONE is simply impossible to reach. Over to " + NAME2 + " for the architecture section.")
 
 # 16 SECTION 03 DIVIDER -------------------------------------------------------
 s = slide(DARK)
@@ -518,28 +520,47 @@ divider(s, "Section 03", "Architecture and implementation.",
 notes(s, NAME2 + ".\n"
     "Section three. We move from the two patterns to the system as a whole. I will show the class diagram and the layers, the sequence of one create-task call, the file structure, and finally how the design lines up with all five SOLID principles.")
 
-# 17 CLASS DIAGRAM ------------------------------------------------------------
-s = slide(PAPER); eyebrow(s, "Architecture  ·  structure", TEAL); tracker(s, 3)
-title(s, "The class diagram.", size=27)
-sub(s, "Three layers: product (tasks), pattern (factories and strategies), coordination (the manager). Every arrow points toward an abstraction.")
-img_panel(s, "class-diagram-simple.png", M, 2.95, SW-2*M, 3.65, accent=TEAL)
-text(s, M, 6.66, SW-2*M, 0.3, [{"t": "Full diagram with all fields and methods in the report. Solid arrow = inheritance · dashed = implements / creates.", "size": 9.5, "color": FAINT, "track": 0.4}], align=PP_ALIGN.CENTER)
+# 17 CLASS · FACTORY METHOD ---------------------------------------------------
+s = slide(PAPER); eyebrow(s, "Architecture  ·  structure  ·  Factory Method", CLAY); tracker(s, 3)
+title(s, "Class view — the Factory Method side.", size=23)
+sub(s, "TaskManager talks only to the abstract TaskFactory, which creates a Task. Each concrete factory and each concrete task slots in underneath.", y=2.12, size=11.5, color=MUTE)
+img_panel(s, "class-factory.png", M, 2.62, SW-2*M, 4.1, accent=CLAY)
 footer(s, 17)
 notes(s, NAME2 + ".\n"
-    "The class diagram in three horizontal layers. The top layer is the product: the Task interface, AbstractTask, and the three concrete tasks. The middle layer is the patterns: the factory hierarchy on one side, the strategy hierarchy on the other. The bottom is coordination: TaskManager plus the three entry points.\n"
-    "The single most important thing to see is that every arrow points toward an abstraction. The manager depends on the Task interface and the TaskFactory abstract class, never on a concrete BugTask. That is Dependency Inversion in visual form, and it is the structural reason a new task type never touches the manager.")
+    "The full class diagram had fourteen classes side by side, so we split it by pattern. This first half is the Factory Method side. Read it top to bottom: TaskManager depends only on the abstract TaskFactory, never on a concrete factory. Each of the three concrete factories extends TaskFactory, and TaskFactory creates a Task.\n"
+    "On the right is the product family the factories build: the Task interface, the AbstractTask base, and the three concrete tasks. The key point is that every arrow points toward an abstraction, the Task interface or the TaskFactory class, which is Dependency Inversion in visual form. That is the structural reason a new task type never touches the manager.")
 
-# 18 SEQUENCE DIAGRAM ---------------------------------------------------------
-s = slide(PAPER); eyebrow(s, "Architecture  ·  behaviour", TEAL); tracker(s, 3)
-title(s, "Creating a task, step by step.", size=24, y=1.18)
-text(s, M, 1.72, SW-2*M, 0.4, [{"t": "The caller passes a type string. The manager finds the registered factory and returns a Task. No concrete class is ever named by the caller.", "size": 11, "color": MUTE, "line": 1.3}])
-img_panel(s, "sequence-diagram.png", M, 2.28, SW-2*M, 4.5, accent=TEAL)
+# 18 CLASS · STRATEGY ---------------------------------------------------------
+s = slide(PAPER); eyebrow(s, "Architecture  ·  structure  ·  Strategy", TEAL); tracker(s, 3)
+title(s, "Class view — the Strategy side.", size=23)
+sub(s, "TaskManager holds one PriorityStrategy and can swap it at runtime. Each ordering is an interchangeable implementation of the same interface.", y=2.12, size=11.5, color=MUTE)
+img_panel(s, "class-strategy.png", M, 2.62, SW-2*M, 4.1, accent=TEAL)
 footer(s, 18)
 notes(s, NAME2 + ".\n"
-    "This sequence diagram traces one createTask call. The entry point asks the manager for a BUG. The manager looks up the factory registered under that key, asks it to build the task, and returns a Task reference. Notice what does not happen: the caller never constructs or imports BugTask.\n"
-    "This is the runtime counterpart of the class diagram. The static view shows arrows pointing at abstractions; this dynamic view shows that at call time the concrete type stays hidden behind the manager and the factory.")
+    "The second half is the Strategy side, and it is deliberately simple. TaskManager holds a single PriorityStrategy reference through its setPriorityStrategy and getPrioritizedTasks methods. It depends only on that interface.\n"
+    "Underneath, the three orderings, UrgentFirst, DeadlineFirst, and SeverityFirst, each implement the one sort method. Because the manager only knows the interface, we can swap one ordering for another, or add a fourth, without editing the manager at all. That is the Open/Closed principle falling straight out of the pattern.")
 
-# 19 IMPLEMENTATION OVERVIEW --------------------------------------------------
+# 19 SEQUENCE · CREATING A TASK -----------------------------------------------
+s = slide(PAPER); eyebrow(s, "Architecture  ·  behaviour  ·  creation", CLAY); tracker(s, 3)
+title(s, "Creating a task, step by step.", size=23)
+sub(s, "The caller passes a type string; the manager looks up the registered factory and returns a Task. No concrete class is ever named by the caller.", y=2.12, size=11.5, color=MUTE)
+img_panel(s, "seq-create.png", M, 2.62, SW-2*M, 4.1, accent=CLAY)
+footer(s, 19)
+notes(s, NAME2 + ".\n"
+    "Now the runtime view of the same Factory Method. Trace one createTask call. The entry point, Main, asks the manager for a BUG. The manager looks up the factory registered under that key in its registry, gets the bug factory back, and asks it to build the task. The factory constructs a BugTask and hands it back as a Task reference.\n"
+    "Notice what never happens: the caller never writes new BugTask and never imports it. The concrete type stays hidden behind the manager and the factory the whole way through. This is the dynamic counterpart of the class diagram you just saw.")
+
+# 20 SEQUENCE · ORDERING THE LIST ---------------------------------------------
+s = slide(PAPER); eyebrow(s, "Architecture  ·  behaviour  ·  ordering", TEAL); tracker(s, 3)
+title(s, "Ordering the list, step by step.", size=23)
+sub(s, "Set a strategy, then ask for the prioritized list. The manager delegates the sort to whichever strategy is currently set.", y=2.12, size=11.5, color=MUTE)
+img_panel(s, "seq-order.png", M, 2.62, SW-2*M, 4.1, accent=TEAL)
+footer(s, 20)
+notes(s, NAME2 + ".\n"
+    "And the runtime view of Strategy. First the caller sets a strategy, here DeadlineFirst, and the manager just stores it as the current strategy. Then the caller asks for the prioritized tasks. The manager does not sort anything itself; it delegates to whichever strategy object is currently set, which sorts by deadline and returns the ordered list.\n"
+    "Swap in SeverityFirst and the exact same call returns a different order, with no recompile. That is the whole point of Strategy: the manager owns the list, the strategy owns the rule, and the two vary independently.")
+
+# 21 IMPLEMENTATION OVERVIEW --------------------------------------------------
 s = slide(PAPER); eyebrow(s, "Implementation  ·  structure", TEAL); tracker(s, 3)
 title(s, "Sixteen files, three layers.")
 sub(s, "No package declarations, only java.util and java.time imported. The columns mirror the three layers of the class diagram.")
@@ -552,12 +573,12 @@ listpanel(s, M+2*(colw+gap), 2.95, colw, 3.3, TEAL_T, "settings-01", "indigo", "
     ["TaskManager (coordinator)","Main (automated tests)","TaskManagementApp (console)","gui.TaskManagerGUI (Swing)"], TEAL, isize=11.5, gap=0.5)
 rrect(s, M, 6.42, SW-2*M, 0.56, PANEL, radius=0.06)
 text(s, M+0.3, 6.42, SW-2*M-0.6, 0.56, [{"t": "All three entry points drive the same engine through its public API.   2 interfaces · 1 enum · 1 abstract · 12 concrete classes.", "size": 11, "color": BODY, "line": 1.2}], anchor=MSO_ANCHOR.MIDDLE)
-footer(s, 19)
+footer(s, 21)
 notes(s, NAME2 + ".\n"
     "The implementation, grouped by the same three layers. The product layer holds the Task interface, the abstract base, the three concrete tasks, and the status enum. The pattern layer holds the abstract factory and its three subclasses, plus the strategy interface and its three implementations. The coordination layer is the single TaskManager, plus the three entry points: Main for automated tests, TaskManagementApp for the console, and the Swing GUI.\n"
     "Sixteen files, two interfaces, one enum, one abstract class, twelve concrete classes, and the only imports are java.util and java.time. Crucially, all three entry points use the same engine through its public API, which is what lets the GUI and the console behave identically.")
 
-# 20 SOLID --------------------------------------------------------------------
+# 22 SOLID --------------------------------------------------------------------
 s = slide(PAPER); eyebrow(s, "Implementation  ·  principles", TEAL); tracker(s, 3)
 title(s, "How the design meets SOLID.")
 sol=[("target-01","indigo",INDIGO_T,"S · Single responsibility","Factories build, strategies sort, the manager coordinates. One reason to change each."),
@@ -570,20 +591,20 @@ gap=0.45; colw=(SW-2*M-2*gap)/3; rh=1.78
 for i,(icon,key,tint,h,b) in enumerate(sol):
     c,r=i%3,i//3; x=M+c*(colw+gap); y=2.5+r*(rh+0.24)
     card(s, x, y, colw, rh, tint, icon, key, h, b, tsize=12.5, bsize=10.8, cs=0.46)
-footer(s, 20)
+footer(s, 22)
 notes(s, NAME2 + ".\n"
     "SOLID, briefly, because it falls out of the two patterns rather than being bolted on. Single responsibility: factories build, strategies sort, the manager coordinates. Open/Closed: a new type or sort is a new file and one line, with zero edits to old code, which is our central objective. Liskov: every factory and strategy stands in for its abstraction without surprises. Interface segregation: the strategy interface has one method, and the Task interface is minimal. Dependency inversion: the manager references only abstractions.\n"
-    "The throughline at the bottom sums it up: abstractions in the middle, concrete classes at the edges. If you want one example of inversion, it is that there is no new BugTask anywhere inside the manager. Over to both of us for the demonstration.")
+    "The throughline at the bottom sums it up: abstractions in the middle, concrete classes at the edges. If you want one example of inversion, it is that there is no new BugTask anywhere inside the manager. On to the live demonstration.")
 
-# 21 SECTION 04 DIVIDER -------------------------------------------------------
+# 23 SECTION 04 DIVIDER -------------------------------------------------------
 s = slide(DARK)
 divider(s, "Section 04", "Live demonstration.",
         "The compiled system, run three ways: the automated test suite, the interactive console, and the Swing GUI.",
         "1E7A45", "terminal", 4)
-notes(s, "Both. " + NAME2 + " drives, " + NAME1 + " narrates.\n"
-    "Section four is the live demonstration, which the assignment requires. We run the automated tests first, then open the GUI and switch the strategy live, create a task through the factory, and trigger an illegal lifecycle move so you can watch the engine reject it. It is rehearsed to about three minutes, and we have screenshots as a backup if the projector fails.")
+notes(s, NAME2 + ".\n"
+    "Section four is the live demonstration, which the assignment requires. I run the automated tests first, then open the GUI and switch the strategy live, create a task through the factory, and trigger an illegal lifecycle move so you can watch the engine reject it. It is rehearsed to about three minutes, and we have screenshots as a backup if the projector fails.")
 
-# 22 DEMO 1 · TERMINAL --------------------------------------------------------
+# 24 DEMO 1 · TERMINAL --------------------------------------------------------
 s = slide(PAPER); eyebrow(s, "Live demonstration  ·  demo 1  ·  the terminal", GREEN); tracker(s, 4)
 title(s, "Demo 1 — the terminal.", size=27)
 text(s, M, 2.04, SW-2*M, 0.4, [{"t": "Open a terminal in the project root folder, then paste the command for each step.", "size": 12, "color": BODY, "line": 1.3}])
@@ -609,12 +630,12 @@ cmdcard(s, cx, 4.70, cw, "STEP 3 · OPEN THE INTERACTIVE CONSOLE", "java -cp bin
 rrect(s, cx, 5.86, cw, 0.82, PANEL, radius=0.06)
 text(s, cx+0.26, 5.86, cw-0.5, 0.82, [[{"t": "Inside the console menu:", "size": 10.5, "color": INK, "font": SANS_SB}],
      [{"t": "1 create a task (Factory)   ·   4 change the sort (Strategy)   ·   3 view sorted   ·   5 change status (State)", "size": 9.5, "color": BODY, "line": 1.25, "space_before": 3}]], anchor=MSO_ANCHOR.MIDDLE)
-footer(s, 22)
-notes(s, "Both. " + NAME2 + " runs the commands, " + NAME1 + " narrates.\n"
+footer(s, 24)
+notes(s, NAME2 + ".\n"
     "Demo one is the terminal, because it proves the architecture and not just the interface. Open a terminal in the project root. Step one, paste the javac line to build once. Step two, paste java -cp bin Main: six sections scroll past and it ends on ALL TESTS PASSED, exactly the screen on the left, so every pattern is checked before we touch anything by hand.\n"
-    "Step three, paste java -cp bin TaskManagementApp to open the interactive console on the very same engine. From the menu: option 1 creates a task and the Type you enter chooses the factory; option 4 switches the strategy and option 3 re-lists it, so the order changes live with no recompile; option 5 walks a task through its lifecycle. Then " + NAME2 + " takes the GUI.")
+    "Step three, paste java -cp bin TaskManagementApp to open the interactive console on the very same engine. From the menu: option 1 creates a task and the Type you enter chooses the factory; option 4 switches the strategy and option 3 re-lists it, so the order changes live with no recompile; option 5 walks a task through its lifecycle. Then on to the GUI.")
 
-# 23 DEMO 2 · GRAPHICAL USER INTERFACE ----------------------------------------
+# 25 DEMO 2 · GRAPHICAL USER INTERFACE ----------------------------------------
 s = slide(PAPER); eyebrow(s, "Live demonstration  ·  demo 2  ·  graphical user interface", GREEN); tracker(s, 4)
 title(s, "Demo 2 — the graphical interface.", size=25)
 text(s, M, 2.04, SW-2*M, 0.4, [{"t": "From the same project root, one command launches the whole interface — the rest is clicks.", "size": 12, "color": BODY, "line": 1.3}])
@@ -630,20 +651,20 @@ for i,(icon,key,tint,h,b) in enumerate(steps):
     chip(s, cx, y, 0.44, tint, icon, key, frac=0.58)
     text(s, cx+0.60, y-0.04, cw-0.60, 0.3, [{"t": h, "size": 12, "color": INK, "font": SANS_SB}])
     text(s, cx+0.60, y+0.23, cw-0.60, 0.42, [{"t": b, "size": 10.2, "color": BODY, "line": 1.18}])
-footer(s, 23)
-notes(s, "Both. " + NAME2 + " drives the GUI, " + NAME1 + " narrates.\n"
+footer(s, 25)
+notes(s, NAME2 + ".\n"
     "Demo two is the graphical interface, the same engine behind a Swing window. There is only one thing to paste: java -jar TaskManagerGUI.jar, run from the project root. Then load the demo data from the Demo menu so the table has tasks in it.\n"
-    "After that it is all clicks, each tied to a pattern. Cycle the Sort by dropdown through Urgent, Deadline, and Severity and the table reorders instantly, which is Strategy. Add a task from the form, where the Type field decides which factory builds it, which is Factory Method. Finally select a row and try to mark an OPEN task DONE: the engine refuses and explains why, then OPEN to IN_PROGRESS is accepted, which is the State machine. Back to me for the evaluation.")
+    "After that it is all clicks, each tied to a pattern. Cycle the Sort by dropdown through Urgent, Deadline, and Severity and the table reorders instantly, which is Strategy. Add a task from the form, where the Type field decides which factory builds it, which is Factory Method. Finally select a row and try to mark an OPEN task DONE: the engine refuses and explains why, then OPEN to IN_PROGRESS is accepted, which is the State machine. On to the evaluation.")
 
-# 24 SECTION 05 DIVIDER -------------------------------------------------------
+# 26 SECTION 05 DIVIDER -------------------------------------------------------
 s = slide(DARK)
 divider(s, "Section 05", "Results, evaluation and conclusion.",
         "What the patterns delivered in practice, the honest limits of this build, and the main lesson.",
         "9A6304", "trophy-01", 5)
-notes(s, NAME1 + ".\n"
+notes(s, NAME2 + ".\n"
     "The final section. We measure the result against the objective we set, we are honest about the limitations and the alternatives we considered, and we close with the conclusion and what we learned.")
 
-# 25 RESULTS ------------------------------------------------------------------
+# 27 RESULTS ------------------------------------------------------------------
 s = slide(PAPER); eyebrow(s, "Results  ·  what the patterns delivered", AMBER); tracker(s, 5)
 title(s, "New types and orderings, without editing existing code.", size=27)
 gap=0.5; colw=(SW-2*M-gap)/2
@@ -656,12 +677,12 @@ listpanel(s, M+colw+gap, 2.55, colw, 3.7, GREEN_T, "check-circle", "green", "Wha
     "The GUI dropdown proves the Strategy swap, live.",
     "The lifecycle enum makes every illegal transition unreachable.",
     "Main doubles as the test harness, with no JUnit needed."], GREEN, isize=12, gap=0.66)
-footer(s, 25)
-notes(s, NAME1 + ".\n"
+footer(s, 27)
+notes(s, NAME2 + ".\n"
     "Did the design meet its objective? On the left, in numbers: a new task type costs two new files and one registration line, with zero edits to existing code; a new ordering costs one new file and one setter call, again zero edits. We did not just claim this; Test 5 in Main checks the property at runtime.\n"
     "On the right, what actually happened during the project. We added the Documentation type late, with no edits to existing code. The GUI dropdown demonstrates the strategy swap live. The lifecycle enum blocks illegal transitions at runtime, before bad state can spread. And Main served as our test harness without pulling in JUnit, which kept the zero-dependency rule.")
 
-# 26 LIMITATIONS --------------------------------------------------------------
+# 28 LIMITATIONS --------------------------------------------------------------
 s = slide(PAPER); eyebrow(s, "Evaluation  ·  limitations and alternatives", AMBER); tracker(s, 5)
 title(s, "An honest look at the design.")
 iconcol3(s, [("Limitations","All data is in memory; nothing persists. Single user, no concurrency. Validation throws on the first error rather than collecting them all."),
@@ -670,12 +691,12 @@ iconcol3(s, [("Limitations","All data is in memory; nothing persists. Single use
          y=2.6, specs=[(AMBER,AMBER_T,"alert-circle","amber"),(INDIGO,INDIGO_T,"intersect-circle","indigo"),(INDIGO,INDIGO_T,"clock-fast-forward","indigo")])
 rrect(s, M, 5.5, SW-2*M, 0.92, PANEL, radius=0.06)
 text(s, M+0.3, 5.5, SW-2*M-0.6, 0.92, [{"t": "Every limitation above is a scoping choice, not a structural one. The engine is decoupled enough that each item is an addition, not a rewrite.", "size": 12, "color": INK, "font": SANS_MD, "line": 1.35}], anchor=MSO_ANCHOR.MIDDLE)
-footer(s, 26)
-notes(s, NAME1 + ".\n"
+footer(s, 28)
+notes(s, NAME2 + ".\n"
     "An honest evaluation, which the rubric asks for. Limitations: everything is in memory so nothing persists, it is single-user with no concurrency control, and validation throws on the first error rather than collecting them. These are real, and they are deliberate scoping choices for an academic project.\n"
     "Alternatives we weighed: we considered Abstract Factory but rejected it, because we have only one product family, a single Task, so the extra abstraction would not earn its keep. We considered a raw Comparator instead of Strategy, but that loses the named role and handles the bugs-first sort awkwardly. Future work would be persistence with a Repository, tags with a Specification, async dispatch, and a REST layer. Because the engine is decoupled, each of these is an addition, not a rewrite.")
 
-# 27 CONCLUSION ---------------------------------------------------------------
+# 29 CONCLUSION ---------------------------------------------------------------
 s = slide(PAPER); eyebrow(s, "Conclusion", AMBER); tracker(s, 5)
 title(s, "What we set out to do, and what we learned.")
 concl=[("check-verified-01","green",GREEN_T,"What we achieved","A working task system where new types and new orderings cost no edits to existing, tested code."),
@@ -686,12 +707,12 @@ gap=0.5; colw=(SW-2*M-gap)/2; rh=1.74
 for i,(icon,key,tint,h,b) in enumerate(concl):
     c,r=i%2,i//2; x=M+c*(colw+gap); y=2.55+r*(rh+0.26)
     card(s, x, y, colw, rh, tint, icon, key, h, b, tsize=13.5)
-footer(s, 27)
-notes(s, NAME1 + ".\n"
+footer(s, 29)
+notes(s, NAME2 + ".\n"
     "To conclude. What we achieved: a working system that meets the objective we set, new types and orderings without editing existing code. The patterns earned their place, because each one answered a specific problem from section one rather than ticking a box.\n"
     "Our main lesson was about naming: calling something a factory or a strategy makes the code explain itself to the next developer who reads it. And the bigger point, the reason the course exists: design patterns are a shared vocabulary that lets a team extend software without breaking what already works. Thank you, and we are happy to take questions.")
 
-# 28 THANK YOU (no names) -----------------------------------------------------
+# 30 THANK YOU (no names) -----------------------------------------------------
 s = slide(DARK)
 text(s, M, 2.5, 11.9, 1.8, [[{"t": "Thank you.", "size": 48, "color": WHITE, "font": SERIF_SB, "line": 1.04}],
                             [{"t": "Questions welcome.", "size": 48, "color": INDIGO_D, "font": SERIF_SB, "line": 1.04, "space_before": 4}]])
@@ -706,25 +727,25 @@ for lab,col in leg:
     lx += 0.36 + (2.0 if lab!="Strategy" else 1.5)
 text(s, SW-M-3.4, 6.06, 3.4, 0.34, [{"t": "SEN3006 · SOFTWARE ARCHITECTURE", "size": 9.5, "color": GRAYW, "track": 1.4, "font": SANS_SB}], align=PP_ALIGN.RIGHT)
 notes(s, "Both.\n"
-    "Thank you. We will split questions by area: " + NAME1 + " takes the problem framing, Factory Method, SOLID, and the evaluation; " + NAME2 + " takes Strategy, the architecture, and the lifecycle.\n"
+    "Thank you. We will split questions by area: " + NAME1 + " takes the problem framing and the three patterns, Factory Method, Strategy, and State; " + NAME2 + " takes the architecture, the live demo, SOLID, and the evaluation.\n"
     "Anticipated questions. Why an abstract factory class instead of an interface? Per-subclass defaults plus Template Method. Why a strategy interface instead of a Comparator? It advertises the role and supports the partition-then-sort. Why a string-keyed registry? Runtime lookup from any entry point. Why no JUnit? The zero-dependency rule, with Main as the harness. The study guide in docs/design has a fuller cheat sheet.")
 
-# 29 APPENDIX · component view -----------------------------------------------
+# 31 APPENDIX · component view -----------------------------------------------
 s = slide(PAPER); eyebrow(s, "Appendix  ·  supporting view"); tracker(s, 5)
 title(s, "Component view.", size=27)
 sub(s, "The module structure: the UI depends on the manager, which delegates to the factory and strategy modules over the shared domain model.")
 img_panel(s, "component-diagram.png", M, 3.0, SW-2*M, 3.0, accent=INDIGO)
 text(s, M, 6.18, SW-2*M, 0.3, [{"t": "Each box is a module; every arrow is a compile-time dependency pointing inward toward the manager and the abstractions.", "size": 9.5, "color": FAINT, "track": 0.4}], align=PP_ALIGN.CENTER)
-footer(s, 29)
+footer(s, 31)
 notes(s, "Appendix, for questions.\n"
     "A supporting view kept in reserve. The component diagram groups the system into the UI, manager, factory, strategy, and domain modules. Every dependency points inward toward the manager and the abstractions, which is the module-level echo of the class diagram. It is explained in full in the report.")
 
-# 30 APPENDIX · deployment view ----------------------------------------------
+# 32 APPENDIX · deployment view ----------------------------------------------
 s = slide(PAPER); eyebrow(s, "Appendix  ·  supporting view"); tracker(s, 5)
 title(s, "Deployment view.", size=27)
 sub(s, "One JVM, one shared engine, three entry points. No network, no database, no external services.")
 img_panel(s, "deployment-diagram.png", 2.7, 2.95, SW-2*2.7, 3.5, accent=INDIGO)
-footer(s, 30)
+footer(s, 32)
 notes(s, "Appendix, for questions.\n"
     "The last supporting view. The deployment diagram shows the whole system runs in a single Java virtual machine, with the three entry points, Main, the console app, and the GUI, all driving one shared engine. There is no network and no external service, which is what zero dependencies means in practice. It is explained in full in the report.")
 

@@ -1,0 +1,25 @@
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#F8EFE7','primaryBorderColor':'#BC5A2B','primaryTextColor':'#1C1A16','lineColor':'#8C877D','fontFamily':'Inter, Segoe UI, sans-serif'}}}%%
+classDiagram
+    direction TB
+    class TaskManager {
+        +createTask(type)
+    }
+    class TaskFactory {
+        <<abstract>>
+        +createTask()
+    }
+    class Task {
+        <<interface>>
+    }
+    class AbstractTask {
+        <<abstract>>
+    }
+    TaskManager --> TaskFactory : uses
+    BugTaskFactory --|> TaskFactory
+    FeatureTaskFactory --|> TaskFactory
+    DocumentationTaskFactory --|> TaskFactory
+    TaskFactory ..> Task : creates
+    AbstractTask ..|> Task
+    BugTask --|> AbstractTask
+    FeatureTask --|> AbstractTask
+    DocumentationTask --|> AbstractTask

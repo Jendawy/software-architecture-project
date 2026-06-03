@@ -1,0 +1,26 @@
+%%{init: {'theme':'base','themeVariables':{'actorBkg':'#E6F1EF','actorBorder':'#0E7C72','actorTextColor':'#1C1A16','signalColor':'#57534B','signalTextColor':'#1C1A16','noteBkgColor':'#E2F0ED','noteBorderColor':'#0E7C72','noteTextColor':'#1C1A16','activationBkgColor':'#D6EAE6','activationBorderColor':'#0E7C72','sequenceNumberColor':'#FFFFFF','fontFamily':'Inter, Segoe UI, sans-serif'}}}%%
+sequenceDiagram
+    actor PM as Project Manager
+    participant Main
+    participant TM as TaskManager
+    participant DFS as DeadlineFirstStrategy
+    Note over PM, DFS: Ordering the list — Strategy
+    PM->>Main: setPriorityStrategy(new DeadlineFirstStrategy())
+    activate Main
+    Main->>TM: setPriorityStrategy(deadlineFirstStrategy)
+    activate TM
+    TM->>TM: currentStrategy = deadlineFirstStrategy
+    TM-->>Main: void
+    deactivate TM
+    PM->>Main: getPrioritizedTasks()
+    Main->>TM: getPrioritizedTasks()
+    activate TM
+    TM->>DFS: sort(tasks)
+    activate DFS
+    DFS->>DFS: sort by deadline (earliest first)
+    DFS-->>TM: sortedTasks
+    deactivate DFS
+    TM-->>Main: sortedTasks
+    deactivate TM
+    Main-->>PM: Display prioritized list
+    deactivate Main

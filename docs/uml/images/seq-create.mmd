@@ -1,0 +1,30 @@
+%%{init: {'theme':'base','themeVariables':{'actorBkg':'#F8EFE7','actorBorder':'#BC5A2B','actorTextColor':'#1C1A16','signalColor':'#57534B','signalTextColor':'#1C1A16','noteBkgColor':'#F4ECE3','noteBorderColor':'#BC5A2B','noteTextColor':'#1C1A16','activationBkgColor':'#F1E2D6','activationBorderColor':'#BC5A2B','sequenceNumberColor':'#FFFFFF','fontFamily':'Inter, Segoe UI, sans-serif'}}}%%
+sequenceDiagram
+    actor PM as Project Manager
+    participant Main
+    participant TM as TaskManager
+    participant Registry as factoryRegistry
+    participant BTF as BugTaskFactory
+    participant BT as BugTask
+    Note over PM, BT: Creating a task — Factory Method
+    PM->>Main: createTask("BUG", "Fix login", 1)
+    activate Main
+    Main->>TM: createTask("BUG", "Fix login", 1)
+    activate TM
+    TM->>Registry: get("BUG")
+    activate Registry
+    Registry-->>TM: bugTaskFactory
+    deactivate Registry
+    TM->>BTF: createTask("Fix login", 1)
+    activate BTF
+    BTF->>BT: new BugTask("Fix login", 1)
+    activate BT
+    BT-->>BTF: bugTask
+    deactivate BT
+    BTF-->>TM: bugTask
+    deactivate BTF
+    TM->>TM: tasks.add(bugTask)
+    TM-->>Main: bugTask
+    deactivate TM
+    Main-->>PM: Task created successfully
+    deactivate Main

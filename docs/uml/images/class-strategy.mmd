@@ -1,0 +1,15 @@
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#E6F1EF','primaryBorderColor':'#0E7C72','primaryTextColor':'#1C1A16','lineColor':'#8C877D','fontFamily':'Inter, Segoe UI, sans-serif'}}}%%
+classDiagram
+    direction TB
+    class TaskManager {
+        +setPriorityStrategy(s)
+        +getPrioritizedTasks()
+    }
+    class PriorityStrategy {
+        <<interface>>
+        +sort(tasks)
+    }
+    TaskManager --> PriorityStrategy : uses
+    UrgentFirstStrategy ..|> PriorityStrategy
+    DeadlineFirstStrategy ..|> PriorityStrategy
+    SeverityFirstStrategy ..|> PriorityStrategy
