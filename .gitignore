@@ -50,6 +50,8 @@ deck/__pycache__/
 deck/_cap/
 deck/_dia/
 deck/_render/
+deck/_ico/
+deck/build_arch_deck_bw_backup.py
 
 # Scratch verification screenshots
 docs/report/_*.png
