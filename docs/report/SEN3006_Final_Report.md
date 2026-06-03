@@ -160,7 +160,7 @@ The rendered diagrams follow. The first three (class, sequence, use case) are ma
 | Over-engineering (applying patterns where simpler code would suffice) | Medium | Medium | Keep scope minimal; every pattern use must be justified by a concrete extensibility requirement. |
 | Pattern misapplication (e.g., confusing Factory Method with Abstract Factory) | Medium | High | Follow GoF definitions strictly; validate with Refactoring Guru and *Head First Design Patterns* references. |
 | UML diagrams drifting from code | High | Medium | Generate diagrams from PlantUML sources checked into the repo; update diagrams whenever class structure changes. |
-| Java environment/JDK path issues on target machine | Medium | Low | Document build/run commands in [CLAUDE.md](../../CLAUDE.md) and use the JDK bundled with the VS Code Java extension. |
+| Java environment/JDK path issues on target machine | Medium | Low | Document build/run commands in the project README and use the JDK bundled with the editor's Java extension. |
 | Scope creep toward persistence or GUI | Medium | High | Explicitly exclude these from scope; record them under "Potential Improvements". |
 | Loss of work / accidental file deletion | Low | High | Git commits after every work package; remote backup on GitHub. |
 | Deadline slippage (June 5, 2026) | Low | High | Milestones per WP; reporting (WP5) started in parallel with implementation (WP3). |
