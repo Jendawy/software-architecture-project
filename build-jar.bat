@@ -1,5 +1,5 @@
 @echo off
-REM Builds TaskManagerGUI.jar — runnable JAR for the GUI demo.
+REM Builds TaskManagerGUI.jar - runnable JAR for the GUI demo.
 REM Run this once before zipping for the professor.
 
 setlocal

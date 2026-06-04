@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Builds TaskManagerGUI.jar — a self-contained runnable JAR for the GUI demo.
+# Builds TaskManagerGUI.jar - a self-contained runnable JAR for the GUI demo.
 # Run this once before zipping for the professor.
 
 set -euo pipefail
